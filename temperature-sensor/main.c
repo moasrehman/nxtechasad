@@ -19,7 +19,7 @@ struct tMessage {
     double avgT;
 };
 
-struct tMessage messArr[60];
+struct tMessage messArr[FAILBUFFERLENGTH];
 
 void delay_ms(int number_of_milliseconds)
 {
@@ -49,27 +49,52 @@ void display_read_reading(char read_value)
 
 }
 
-
-int getTempinInt(int linecount)
+//read a single value from the text file
+double getTemperature(int linecount)
 {
     FILE* file = fopen ("temperature2.txt", "r");
-    int i = 0;
+    double i = 0;
 
     fscanf (file, "%d", &i);
     for (int p=0; p<linecount; p++)
     {
-        fscanf (file, "%d", &i);      
+        int k =0;
+        
+        fscanf (file, "%d", &k);
+        i = k; //convert value to double from integer
     }
     fclose (file);
 
     return i;
 }
 
+/****THEORY****
+ * Given:
+ * ------
+ * For example the ADC can read the following values from the sensor:
+ *  - 2048 (rougly 0C)
+ *  - 3000 (rougly 23C)
+ * 
+ * =>
+ * --
+ * 1 deg C ~= 41 units of ADC value.
+ * 
+ **************/
+double convertTemptodegC (double rawtemp)
+{
+    // double degCTemp = 0;
+    // degCTemp =  ((rawtemp - 2048.00) / 41.00);
+
+    // printf ("Raw temperature= %.02f, Converted temperature= %.02f", rawtemp, degCTemp);
+    return ((rawtemp - 2048.00) / 41.00);
+}
+
 //struct tMessage messArr[60];
 void make_and_send_values(char* startT, char* endT, double max_val, double min_val, double avg_val)
 {
-    //TODO: make a push-pop to store readings in case.
-    //store readings to array
+    //TODO:
+    //DONE: make a push-pop to store readings in case.
+    //DONE: store readings to array
     //transmit 1st reading in array: to POST function
     //check if transmit successful
     //reduce array pointer by 1: if transmit successful
@@ -77,7 +102,7 @@ void make_and_send_values(char* startT, char* endT, double max_val, double min_v
     //if array pointer is <=0, set array pointer to 0.
     //increase array pointer by 1: if transmit unsuccessful
     
-    //store readings to array
+    //store readings to pipeline
     messArr[0].startT = startT;
     messArr[0].endT = endT;
     messArr[0].maxT = max_val;
@@ -165,11 +190,12 @@ volatile char start_time[128];
 
 volatile char end_time[128];
 
-//double getTemperature();
-//double getTemperature(int);
-int getTempinInt(int);
+double convertTemptodegC (double);
+double getTemperature(int);
+
 int main()
 {
+    static double rawTemperature = 0;
     static double gotTemperature = 0;
 
     static double minTemperature = 5000; //arbitary big number. TODO: Read first value from file
@@ -191,10 +217,13 @@ int main()
     while (1)
     {
         //****************read temperature from file (increment line number on every read)
-       gotTemperature = getTempinInt(temperature_file_line_count++);
+        rawTemperature = getTemperature(temperature_file_line_count++);
+
+       //TODO: convert read value to celcius:
+        gotTemperature = convertTemptodegC(rawTemperature);
 
         //****************display_read_reading(gotTemperature);
-        printf("\n temperature read: %.02f", gotTemperature);
+        printf("\n temperature read: %.02f deg C.", gotTemperature);
 
         //**************** store value for calculation and reporting.
 //        temperture_table[time_elapsed] = gotTemperature;
@@ -226,6 +255,7 @@ int main()
             printf("\n two minutes completed");
 
             avgTemperature = avgTemperature / (UPLOAD_INTV_MS/READ_DELAY_MS);
+            //TODO: debug average value above.
 
             make_and_send_values(&start_time, &end_time, maxTemperature, minTemperature, avgTemperature);
 

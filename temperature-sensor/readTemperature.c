@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double getTemperature(int file_line_number) //char read_one_reading()
+double getTemperatureOld(int file_line_number) //char read_one_reading()
 {
     FILE *fptr;
 
