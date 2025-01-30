@@ -68,52 +68,47 @@ int getTempinInt(int linecount)
 //struct tMessage messArr[60];
 void make_and_send_values(char* startT, char* endT, double max_val, double min_val, double avg_val)
 {
-    printf("\n maxT: %.02f, minT: %.02f, avgT: %.02f.", max_val, min_val, avg_val);
-
-
-    //char startTime[] = "Start time";
-
-//TODO: make a push-pop to store readings in case.
-//store reading to array
-//transmit 1st reading in array: to POST function
-//check if transmit successful
-//reduce array pointer by 1: if transmit successful
-//if array pointer > 1 : goto transmit 1st reading again
-//if array pointer is <=0, set array pointer to 0.
-//increase array pointer by 1: if transmit unsuccessful
+    //TODO: make a push-pop to store readings in case.
+    //store readings to array
+    //transmit 1st reading in array: to POST function
+    //check if transmit successful
+    //reduce array pointer by 1: if transmit successful
+    //if array pointer > 1 : goto transmit 1st reading again
+    //if array pointer is <=0, set array pointer to 0.
+    //increase array pointer by 1: if transmit unsuccessful
     
-    
+    //store readings to array
     messArr[0].startT = startT;
     messArr[0].endT = endT;
+    messArr[0].maxT = max_val;
+    messArr[0].minT = min_val;
+    messArr[0].avgT = avg_val;
 
-    //printf ("/n %s", messArr[0].startT);
     printf ("\n Start time:  %s", messArr[0].startT);
+    printf("\n maxT: %.02f, minT: %.02f, avgT: %.02f.", max_val, min_val, avg_val);
     printf ("\n End time:  %s", messArr[0].endT);
 
-    //while(1);
+    //TODO: make JSON format of data to transmit
+    /*```
+    // TemperatureMeasurement
+    {
+        "time": {
+            "start": string, // Start date and time in ISO8601 format for the measurement
+            "end": string // End date and time in ISO8601 format for the measurement
+        },
+        "min": number, // Minimum observed temperature
+        "max": number, // Maximum observed temperature
+        "average": number // Average temperature
+    }
+    ``` */
+    //TODO: send as HTTP POST request.
 
-//TODO: Read time and make ISO:8601 format
-//TODO: make JSON format of data to transmit
-/*```
-// TemperatureMeasurement
-{
-	"time": {
-		"start": string, // Start date and time in ISO8601 format for the measurement
-		"end": string // End date and time in ISO8601 format for the measurement
-	},
-	"min": number, // Minimum observed temperature
-	"max": number, // Maximum observed temperature
-	"average": number // Average temperature
-}
-``` */
-//TODO: send as HTTP POST request.
-
-
-char request[] = "POST /mes/rest/r2Label/print/Biesse/105/1B6D0X-----11225105/112251/Q0161B8 HTTP/1.1\r\nHost: meswebapptest.hermanmiller.com\r\nContent-Lenght:9\r\n\r\nname=nina";
+    char request[] = "POST /mes/rest/r2Label/print/Biesse/105/1B6D0X-----11225105/112251/Q0161B8 HTTP/1.1\r\nHost: meswebapptest.hermanmiller.com\r\nContent-Lenght:9\r\n\r\nname=nina";
 }
 /**********TEST CODE********************
  * 
  * 
+ *     //char startTime[] = "Start time";
  *     //char startTime[] = "Start time";
     // time_t time_start;
     // time_start = time(NULL);
@@ -141,22 +136,30 @@ char request[] = "POST /mes/rest/r2Label/print/Biesse/105/1B6D0X-----11225105/11
  * 
  * 
  */
+
+//DONE: Read time and make ISO:8601 format
 void getcurrenttime (char* timestring)
 {
     time_t anytime;
     struct tm *current;
-    //char start_time[128];
 
     time(&anytime);
-
     current = localtime(&anytime);
     strftime(timestring, 128, "%Y-%m-%dT%H:%M:%SZ", current);
-    //printf("Today is %s\n", timestring);
+}
+/*************TEST CODE***********
+ * 
+ *     //char start_time[128];
+ *     //printf("Today is %s\n", timestring);
 
     //return &timestring;
 
     //while(1);
-}
+
+ * 
+ * 
+ * 
+ */
 
 volatile char start_time[128];
 
