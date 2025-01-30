@@ -1,5 +1,6 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <time.h>
 //#include <ctime>
 
@@ -9,6 +10,16 @@
 // #include "httppost/chap06.h"
 // #include "httppost/web_get.c"
 
+
+struct tMessage {
+    char *startT;
+    char *endT;
+    double minT;
+    double maxT;
+    double avgT;
+};
+
+struct tMessage messArr[60];
 
 void delay_ms(int number_of_milliseconds)
 {
@@ -54,11 +65,35 @@ int getTempinInt(int linecount)
     return i;
 }
 
-
-void make_and_send_values(double max_val, double min_val, double avg_val)
+//struct tMessage messArr[60];
+void make_and_send_values(char* startT, char* endT, double max_val, double min_val, double avg_val)
 {
     printf("\n maxT: %.02f, minT: %.02f, avgT: %.02f.", max_val, min_val, avg_val);
 
+
+    //char startTime[] = "Start time";
+
+//TODO: make a push-pop to store readings in case.
+//store reading to array
+//transmit 1st reading in array: to POST function
+//check if transmit successful
+//reduce array pointer by 1: if transmit successful
+//if array pointer > 1 : goto transmit 1st reading again
+//if array pointer is <=0, set array pointer to 0.
+//increase array pointer by 1: if transmit unsuccessful
+    
+    
+    messArr[0].startT = startT;
+    messArr[0].endT = endT;
+
+    //printf ("/n %s", messArr[0].startT);
+    printf ("\n Start time:  %s", messArr[0].startT);
+    printf ("\n End time:  %s", messArr[0].endT);
+
+    //while(1);
+
+//TODO: Read time and make ISO:8601 format
+//TODO: make JSON format of data to transmit
 /*```
 // TemperatureMeasurement
 {
@@ -71,29 +106,61 @@ void make_and_send_values(double max_val, double min_val, double avg_val)
 	"average": number // Average temperature
 }
 ``` */
-
-
-
-
-
-//TODO: make a push-pop to store readings in case.
-//store reading to array
-//transmit 1st reading in array: to POST function
-//check if transmit successful
-//reduce array pointer by 1: if transmit successful
-//if array pointer > 1 : goto transmit 1st reading again
-//if array pointer is <=0, set array pointer to 0.
-//increase array pointer by 1: if transmit unsuccessful
-
-
-//TODO: Read time and make ISO:8601 format
-//TODO: make JSON format of data to transmit
 //TODO: send as HTTP POST request.
 
 
 char request[] = "POST /mes/rest/r2Label/print/Biesse/105/1B6D0X-----11225105/112251/Q0161B8 HTTP/1.1\r\nHost: meswebapptest.hermanmiller.com\r\nContent-Lenght:9\r\n\r\nname=nina";
 }
+/**********TEST CODE********************
+ * 
+ * 
+ *     //char startTime[] = "Start time";
+    // time_t time_start;
+    // time_start = time(NULL);
+    // printf("Seconds since January 1, 1970 = %ld\n", time_start);
 
+    //printf("\n%d-%d-%dT%d:%d:%dZ", tm_sec );
+
+    time_t anytime;
+    struct tm *current;
+    char time_str[128];
+
+    time(&anytime);
+
+    current = localtime(&anytime);
+    strftime(time_str, 128, "%Y-%m-%dT%H:%M:%SZ", current);
+    printf("Today is %s\n", time_str);
+
+
+//    char startTime[] = (char) time_start;
+  //  messArr[0].startT = &startTime;
+    //printf ("/n %s", messArr[0].startT);
+    
+    while(1);
+ * 
+ * 
+ * 
+ */
+void getcurrenttime (char* timestring)
+{
+    time_t anytime;
+    struct tm *current;
+    //char start_time[128];
+
+    time(&anytime);
+
+    current = localtime(&anytime);
+    strftime(timestring, 128, "%Y-%m-%dT%H:%M:%SZ", current);
+    //printf("Today is %s\n", timestring);
+
+    //return &timestring;
+
+    //while(1);
+}
+
+volatile char start_time[128];
+
+volatile char end_time[128];
 
 //double getTemperature();
 //double getTemperature(int);
@@ -115,6 +182,8 @@ int main()
     static int time_elapsed = 0;
     
     printf("Start!");
+
+    getcurrenttime(&start_time);
 
     while (1)
     {
@@ -139,18 +208,32 @@ int main()
 
         if (time_elapsed >= (UPLOAD_INTV_MS/READ_DELAY_MS))
         {
+        // if (time_elapsed >= 3)
+        // {
+            //read end time
+            getcurrenttime(&end_time);
+
+            // messArr[0].startT = &start_time;
+            // messArr[0].endT = &end_time;
+
+            // printf ("\n Start time:  %s", messArr[0].startT);
+            // printf ("\n End time:  %s", messArr[0].endT);
+
             time_elapsed = 0;
             printf("\n two minutes completed");
 
             avgTemperature = avgTemperature / (UPLOAD_INTV_MS/READ_DELAY_MS);
 
-            make_and_send_values(maxTemperature, minTemperature, avgTemperature);
+            make_and_send_values(&start_time, &end_time, maxTemperature, minTemperature, avgTemperature);
 
             //printf("\n maxT, minT, avgT: %.02f, %.02f, %.02f", maxTemperature, minTemperature, avgTemperature);
             
             minTemperature = gotTemperature;
             maxTemperature = gotTemperature;
             avgTemperature = gotTemperature;
+            
+            //read start time
+            getcurrenttime(&start_time);
         }
 
         //**************** wait 100 ms

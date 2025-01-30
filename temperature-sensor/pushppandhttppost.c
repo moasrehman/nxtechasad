@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
 /*// TemperatureMeasurement
 {
 {
@@ -13,15 +15,15 @@
 }
 //*/
 
-struct tMessage {
-    char startT[32];
-    char endT[32];
-    double minT;
-    double maxT;
-    double avgT;
-};
+// struct tMessage {
+//     char *startT;
+//     char *endT;
+//     double minT;
+//     double maxT;
+//     double avgT;
+// };
 
-struct tMessage messArr[60];
+// struct tMessage messArr[60];
 
 
 //void make_and_send_values(double max_val, double min_val, double avg_val)
