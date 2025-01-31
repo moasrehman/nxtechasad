@@ -37,7 +37,7 @@ double getTemperatureOld(int file_line_number) //char read_one_reading()
             // printf("%s", line);
             // printf("%f", (((int)line) * 0.1f)); 
             
-            //TODO: Read as double float from file
+            //DROPPED: Read as double float from file
             return 0;// (float)((int)line * 0.1f);//line;
         }
         else
