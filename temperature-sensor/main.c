@@ -7,7 +7,7 @@
 // #include "readTemperature.c"
 // #include "pushppandhttppost.c"
 // #include "curl/include/curl/curl.h"
-// #include <curl/curl.h>
+#include <curl/curl.h>
 
 
 void delay_ms(int number_of_milliseconds)
@@ -76,10 +76,8 @@ void create_json_payload(Measurement messArr, float max_val, float min_val, floa
     );
 }
 
-// Function to send HTTP POST request using libcurl
+//DROPPED: Function to send HTTP POST request using libcurl
 int send_http_post(const char *url, const char *json_payload) {
-    return 0;
-    /*
     CURL *curl;
     CURLcode res;
     long response_code = 0;
@@ -114,8 +112,15 @@ int send_http_post(const char *url, const char *json_payload) {
     curl_global_cleanup();
 
     return (int)response_code;
-    //*/
+
 }
+/******TEST CODE**********
+ * 
+ * return 0;
+ * 
+ * 
+ * 
+ */
 
 //struct tMessage messArr[60];
 void make_and_send_values(char* startT, char* endT, double max_val, double min_val, double avg_val)
@@ -163,7 +168,7 @@ void make_and_send_values(char* startT, char* endT, double max_val, double min_v
 
     create_json_payload(timemessArr[0], messArr[0].maxT, messArr[0].minT, messArr[0].avgT, json_payload);
 
-    //TODO: send as HTTP POST request.
+    //DROPPED: send as HTTP POST request.
     int response_code;
     
     if (failed_transmission == 0)
